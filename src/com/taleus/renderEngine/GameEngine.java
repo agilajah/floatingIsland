@@ -4,7 +4,6 @@ package com.taleus.renderEngine;
  * Created by Febi Agil Ifdillah on 06/05/2017.
  */
 public class GameEngine implements Runnable {
-
     public static final int TARGET_FPS = 75;
 
     public static final int TARGET_UPS = 30;
@@ -40,13 +39,15 @@ public class GameEngine implements Runnable {
             gameLoop();
         } catch (Exception excp) {
             excp.printStackTrace();
+        } finally {
+            cleanup();
         }
     }
 
     protected void init() throws Exception {
         window.init();
         timer.init();
-        gameLogic.init();
+        gameLogic.init(window);
     }
 
     protected void gameLoop() {
@@ -68,10 +69,14 @@ public class GameEngine implements Runnable {
 
             render();
 
-            if (!window.isvSync()) {
+            if ( !window.isvSync() ) {
                 sync();
             }
         }
+    }
+
+    protected void cleanup() {
+        gameLogic.cleanup();
     }
 
     private void sync() {
