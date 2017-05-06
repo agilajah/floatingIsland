@@ -1,4 +1,4 @@
-package com.taleus;
+package com.taleus.renderEngine;
 
 import org.lwjgl.*;
 import org.lwjgl.glfw.*;
@@ -13,16 +13,23 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryStack.*;
 import static org.lwjgl.system.MemoryUtil.*;
 
-public class Main {
+public class MainGameLoop {
 
     // The window handle
     private long window;
+
+    // To load game data
+    private Loader loader;
+    private Renderer renderer;
+    private RawModel model;
 
     public void run() {
         System.out.println("Hello LWJGL " + Version.getVersion() + "!");
 
         init();
         loop();
+
+        loader.cleanUP();
 
         // Free the window callbacks and destroy the window
         glfwFreeCallbacks(window);
@@ -48,7 +55,7 @@ public class Main {
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE); // the window will be resizable
 
         // Create the window
-        window = glfwCreateWindow(300, 300, "Hello World!", NULL, NULL);
+        window = glfwCreateWindow(640, 480, "Hello World!", NULL, NULL);
         if ( window == NULL )
             throw new RuntimeException("Failed to create the GLFW window");
 
@@ -84,6 +91,25 @@ public class Main {
 
         // Make the window visible
         glfwShowWindow(window);
+
+        // create renderer and loader object
+        loader = new Loader();
+        renderer = new Renderer();
+
+        // OpenGL expects vertices to be defined counter clockwise by default
+        float[] vertices = {
+                // Left bottom triangle
+                -0.5f, 0.5f, 0f,
+                -0.5f, -0.5f, 0f,
+                0.5f, -0.5f, 0f,
+                // Right top triangle
+                0.5f, -0.5f, 0f,
+                0.5f, 0.5f, 0f,
+                -0.5f, 0.5f, 0f
+        };
+
+        // load the model
+        //model = loader.loadToVAO(vertices);
     }
 
     private void loop() {
@@ -95,14 +121,20 @@ public class Main {
         GL.createCapabilities();
 
         // Set the clear color
-        glClearColor(1.0f, 0.0f, 0.0f, 0.0f);
+        glClearColor(0.0f, 1.0f, 0.0f, 0.0f);
 
+        //renderer.prepare();
         // Run the rendering loop until the user has attempted to close
         // the window or has pressed the ESCAPE key.
         while ( !glfwWindowShouldClose(window) ) {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
 
             glfwSwapBuffers(window); // swap the color buffers
+
+            renderer.render(model);
+
+            //game logic
+            // add game logic here
 
             // Poll for window events. The key callback above will only be
             // invoked during this call.
@@ -111,7 +143,7 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        new Main().run();
+        new MainGameLoop().run();
     }
 
 }
