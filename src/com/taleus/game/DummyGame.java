@@ -4,6 +4,7 @@ package com.taleus.game;
  * Created by Febi Agil Ifdillah on 06/05/2017.
  */
 import com.taleus.renderEngine.IGameLogic;
+import com.taleus.renderEngine.Mesh;
 import com.taleus.renderEngine.Window;
 
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_DOWN;
@@ -17,6 +18,8 @@ public class DummyGame implements IGameLogic {
 
     private final Renderer renderer;
 
+    private Mesh mesh;
+
     public DummyGame() {
         renderer = new Renderer();
     }
@@ -24,6 +27,22 @@ public class DummyGame implements IGameLogic {
     @Override
     public void init() throws Exception {
         renderer.init();
+        float[] positions = new float[]{
+                -0.5f,  0.5f, 0.0f,
+                -0.5f, -0.5f, 0.0f,
+                0.5f, -0.5f, 0.0f,
+                0.5f,  0.5f, 0.0f,
+        };
+        float[] colours = new float[]{
+                0.5f, 0.0f, 0.0f,
+                0.0f, 0.5f, 0.0f,
+                0.0f, 0.0f, 0.5f,
+                0.0f, 0.5f, 0.5f,
+        };
+        int[] indices = new int[]{
+                0, 1, 3, 3, 1, 2,
+        };
+        mesh = new Mesh(positions, colours, indices);
     }
 
     @Override
@@ -50,12 +69,13 @@ public class DummyGame implements IGameLogic {
     @Override
     public void render(Window window) {
         window.setClearColor(color, color, color, 0.0f);
-        renderer.render(window);
+        renderer.render(window, mesh);
     }
 
     @Override
     public void cleanup() {
         renderer.cleanup();
+        mesh.cleanUp();
     }
 
 }
